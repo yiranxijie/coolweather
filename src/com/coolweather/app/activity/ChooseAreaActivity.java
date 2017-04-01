@@ -19,6 +19,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -49,12 +50,16 @@ public class ChooseAreaActivity extends Activity {
 	private City selectedCity;
 
 	private int currentLevel;
+	
+	private boolean isFromWeatherActivity;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		isFromWeatherActivity=getIntent().getBooleanExtra("from_weather_activity", false);
 		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-		if(prefs.getBoolean("city_selected", false)){
+		//已经选择了城市且不是从WeatherActivity跳转过来，才会直接跳转到WeatherActivity
+		if(prefs.getBoolean("city_selected", false) && !isFromWeatherActivity){
 			Intent intent=new Intent(this,WeatherActivity.class);
 			startActivity(intent);
 			finish();
@@ -227,6 +232,10 @@ public class ChooseAreaActivity extends Activity {
 		} else if (currentLevel == LEVEL_CITY) {
 			queryProvinces();
 		} else {
+			if(isFromWeatherActivity){
+				Intent intent=new Intent(this,WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}
